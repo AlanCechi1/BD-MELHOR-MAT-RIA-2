@@ -32,3 +32,39 @@ END;
 
 DELIMITER ;
 
+Função para Listar Livros de um Autor Específico:
+
+DELIMITER //
+
+CREATE FUNCTION listar_livros_por_autor(primeiro_nome VARCHAR(255), ultimo_nome VARCHAR(255)) RETURNS TEXT
+BEGIN
+    DECLARE lista_livros TEXT;
+    DECLARE autor_id INT;
+
+    -- Encontre o ID do autor com base no primeiro e último nome fornecidos
+    SELECT id INTO autor_id FROM Autor WHERE primeiro_nome = primeiro_nome AND ultimo_nome = ultimo_nome;
+
+    -- Inicialize a lista
+    SET lista_livros = '';
+
+    -- Crie um cursor para percorrer os livros do autor
+    DECLARE cursor_livros CURSOR FOR
+    SELECT l.titulo
+    FROM Livro l
+    INNER JOIN Livro_Autor la ON l.id = la.id_livro
+    WHERE la.id_autor = autor_id;
+
+    -- Percorra o cursor e adicione os títulos dos livros à lista
+    OPEN cursor_livros;
+    FETCH cursor_livros INTO lista_livros;
+    CLOSE cursor_livros;
+
+    RETURN lista_livros;
+END;
+
+//
+
+DELIMITER ;
+
+
+

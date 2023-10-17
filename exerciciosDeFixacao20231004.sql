@@ -143,6 +143,45 @@ END;
 
 DELIMITER ;
 
+Função para Listar Autores sem Livros Publicados:
+
+
+DELIMITER //
+
+CREATE FUNCTION autores_sem_livros() RETURNS TEXT
+BEGIN
+    DECLARE lista_autores TEXT;
+
+    -- Inicialize a lista
+    SET lista_autores = '';
+
+    -- Crie um cursor para percorrer os autores
+    DECLARE cursor_autores CURSOR FOR
+    SELECT a.primeiro_nome, a.ultimo_nome
+    FROM Autor a
+    LEFT JOIN Livro_Autor la ON a.id = la.id_autor
+    WHERE la.id_livro IS NULL;
+
+    -- Percorra o cursor e adicione os autores à lista
+    OPEN cursor_autores;
+    author_loop: LOOP
+        DECLARE primeiro_nome VARCHAR(255);
+        DECLARE ultimo_nome VARCHAR(255);
+        FETCH cursor_autores INTO primeiro_nome, ultimo_nome;
+        IF primeiro_nome IS NULL THEN
+            LEAVE author_loop;
+        END IF;
+        -- Adicione o autor à lista
+        SET lista_autores = CONCAT(lista_autores, primeiro_nome, ' ', ultimo_nome, ', ');
+    END LOOP author_loop;
+    CLOSE cursor_autores;
+
+    RETURN lista_autores;
+END;
+
+//
+
+DELIMITER ;
 
 
 

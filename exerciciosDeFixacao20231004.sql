@@ -100,6 +100,51 @@ END;
 
 DELIMITER ;
 
+Função para Obter a Média de Livros por Editora:
+
+DELIMITER //
+
+CREATE FUNCTION media_livros_por_editora() RETURNS DECIMAL(10, 2)
+BEGIN
+    DECLARE media DECIMAL(10, 2);
+    DECLARE total_livros INT;
+    DECLARE total_editoras INT;
+
+    -- Inicialize as variáveis
+    SET media = 0;
+    SET total_livros = 0;
+    SET total_editoras = 0;
+
+    -- Crie um cursor para percorrer as editoras
+    DECLARE cursor_editoras CURSOR FOR
+    SELECT id FROM Editora;
+
+    -- Percorra o cursor e calcule a média
+    OPEN cursor_editoras;
+    average_loop: LOOP
+        FETCH cursor_editoras INTO total_editoras;
+        IF total_editoras IS NULL THEN
+            LEAVE average_loop;
+        END IF;
+        -- Conte os livros publicados pela editora atual
+        SELECT COUNT(*) INTO total_livros FROM Livro WHERE id_editora = total_editoras;
+        -- Atualize a média
+        SET media = media + total_livros;
+    END LOOP average_loop;
+    CLOSE cursor_editoras;
+
+    -- Calcule a média
+    SET media = media / total_editoras;
+
+    RETURN media;
+END;
+
+//
+
+DELIMITER ;
+
+
+
 
 
 

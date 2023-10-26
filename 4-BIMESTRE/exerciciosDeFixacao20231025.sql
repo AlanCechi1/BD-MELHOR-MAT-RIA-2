@@ -54,3 +54,22 @@ END;
 //
 DELIMITER ;
 
+Trigger para decrementar o estoque ao inserir um novo pedido na tabela Pedidos e inserir uma mensagem na tabela Auditoria se o estoque ficar abaixo de 5 unidades:
+
+DELIMITER //
+CREATE TRIGGER pedido_insert_trigger
+AFTER INSERT ON Pedidos
+FOR EACH ROW
+BEGIN
+    UPDATE Produtos
+    SET estoque = estoque - NEW.quantidade
+    WHERE id = NEW.produto_id;
+
+    IF (SELECT estoque FROM Produtos WHERE id = NEW.produto_id) < 5 THEN
+        INSERT INTO Auditoria (mensagem) VALUES (CONCAT('Estoque do produto com ID ', NEW.produto_id, ' ficou abaixo de 5 unidades em ', NOW()));
+    END IF;
+END;
+//
+DELIMITER ;
+
+

@@ -21,3 +21,20 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+Trigger para atualização do nome de um cliente na tabela Clientes:
+
+DELIMITER //
+CREATE TRIGGER cliente_update_trigger
+BEFORE UPDATE ON Clientes
+FOR EACH ROW
+BEGIN
+    IF NEW.nome IS NULL OR NEW.nome = '' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Não é permitido atualizar o nome para uma string vazia ou NULL.';
+    ELSE
+        INSERT INTO Auditoria (mensagem) VALUES (CONCAT('Nome do cliente com ID ', OLD.id, ' atualizado de "', OLD.nome, '" para "', NEW.nome, '" em ', NOW()));
+    END IF;
+END;
+//
+DELIMITER ;

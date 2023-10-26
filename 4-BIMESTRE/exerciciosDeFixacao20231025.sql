@@ -38,3 +38,19 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+Trigger para impedir a atualização do nome do cliente para uma string vazia ou NULL e inserir uma mensagem na tabela Auditoria:
+
+DELIMITER //
+CREATE TRIGGER cliente_name_check_trigger
+BEFORE UPDATE ON Clientes
+FOR EACH ROW
+BEGIN
+    IF NEW.nome IS NULL OR NEW.nome = '' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Não é permitido atualizar o nome para uma string vazia ou NULL.';
+    END IF;
+END;
+//
+DELIMITER ;
+
